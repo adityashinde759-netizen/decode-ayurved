@@ -1,1164 +1,224 @@
+<script data-purpose="modal-and-submission-handler">
 
+const DECODE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxHNCZqqsurj_qUf4q5Ka03QZm7o8_1BcEO4k83sHjKnbNLS259rLt_3EKeI-tuCpK3eA/exec";
 
+window.DECODE_MODAL = {
+  modal: document.getElementById("signupModal"),
+  container: document.getElementById("modalContainer"),
+  formView: document.getElementById("modalFormView"),
+  successView: document.getElementById("modalSuccessView"),
+  form: document.getElementById("decodeRegistrationForm"),
 
+  openModal: function() {
+    if (!this.modal) return;
 
-D.E.C.O.D.E. — The Ayurveda Experiential Knowcation | Igatpuri 2026
+    this.formView.classList.remove("hidden");
+    this.successView.classList.add("hidden");
 
+    this.modal.classList.remove(
+      "opacity-0",
+      "pointer-events-none"
+    );
 
+    this.modal.classList.add(
+      "opacity-100",
+      "pointer-events-auto"
+    );
 
+    this.container.classList.remove("scale-95");
+    this.container.classList.add("scale-100");
 
+    setTimeout(function() {
+      const nameInput =
+        document.getElementById("studentName");
 
+      if (nameInput) {
+        nameInput.focus();
+      }
+    }, 150);
+  },
 
+  closeModal: function() {
+    if (!this.modal) return;
 
+    this.modal.classList.remove(
+      "opacity-100",
+      "pointer-events-auto"
+    );
 
+    this.modal.classList.add(
+      "opacity-0",
+      "pointer-events-none"
+    );
 
+    this.container.classList.remove("scale-100");
+    this.container.classList.add("scale-95");
+  },
 
+  handleSubmit: async function(e) {
 
+    e.preventDefault();
 
+    const nameInput =
+      document.getElementById("studentName");
 
+    const mobileInput =
+      document.getElementById("studentMobile");
 
+    const emailInput =
+      document.getElementById("subscriberEmail");
 
+    const submitBtn =
+      document.getElementById("modalSubmitBtn");
 
+    if (!nameInput || !mobileInput || !emailInput) {
+      alert("Registration form is not available.");
+      return;
+    }
 
+    const name =
+      nameInput.value.trim();
 
+    const mobile =
+      mobileInput.value.trim();
 
+    const email =
+      emailInput.value.trim();
 
+    if (!name || !mobile || !email) {
+      alert("Please fill all details.");
+      return;
+    }
 
+    if (submitBtn) {
+      submitBtn.innerText = "Registering...";
+      submitBtn.disabled = true;
+    }
 
-D.E.C.O.D.E.
-Ayurveda Knowcation
+    try {
 
+      const formData = new FormData();
 
+      formData.append("name", name);
+      formData.append("mobile", mobile);
+      formData.append("email", email);
 
+      const response = await fetch(
+        DECODE_SCRIPT_URL,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
 
-About
-Experience
-What You'll Decode
-3-Day Journey
-What's Included
-The Circle
+      const result =
+        await response.json();
 
+      console.log(
+        "DECODE Registration Response:",
+        result
+      );
 
+      if (result.status === "success") {
 
+        this.formView.classList.add("hidden");
+        this.successView.classList.remove("hidden");
 
-        Join DECODE
+        this.form.reset();
 
-      </button>
+        return;
+      }
 
+      if (result.status === "duplicate") {
 
+        const successHeading =
+          document.querySelector(
+            "#modalSuccessView h3"
+          );
 
+        const successText =
+          document.querySelector(
+            "#modalSuccessView p"
+          );
 
+        if (successHeading) {
+          successHeading.innerText =
+            "You're already on the DECODE list!";
+        }
 
+        if (successText) {
+          successText.innerText =
+            "This Gmail address has already been registered for DECODE Ayurveda.";
+        }
 
+        this.formView.classList.add("hidden");
+        this.successView.classList.remove("hidden");
 
+        return;
+      }
 
+      throw new Error(
+        result.message ||
+        "Registration failed."
+      );
 
+    } catch (error) {
 
+      console.error(
+        "DECODE registration error:",
+        error
+      );
 
+      alert(
+        "Something went wrong while registering. Please try again."
+      );
 
-About
-The Experience
-What You'll Decode
-3-Day Journey
-What's Included
-The DECODE Circle
+    } finally {
 
-    Join DECODE
+      if (submitBtn) {
+        submitBtn.innerText = "Join DECODE";
+        submitBtn.disabled = false;
+      }
 
-  </button>
+    }
 
+  }
+};
 
 
+window.addEventListener(
+  "click",
+  function(e) {
 
+    const modal =
+      document.getElementById("signupModal");
 
+    const container =
+      document.getElementById("modalContainer");
 
+    if (
+      e.target === modal &&
+      !container.contains(e.target)
+    ) {
 
+      window.DECODE_MODAL.closeModal();
 
+    }
 
+  }
+);
 
 
+window.addEventListener(
+  "keydown",
+  function(e) {
 
+    if (e.key === "Escape") {
+      window.DECODE_MODAL.closeModal();
+    }
 
+  }
+);
 
-
-
-
-
-
-
-
-
-          Roots via Routes
-
-        </span>
-
-
-
-
-
-
-      Exclusively for Ayurveda Learners
-
-    </div>
-
-
-
-      The Ayurveda you studied. <br class="hidden sm:inline"/>
-
-The Ayurveda you were meant to experience.
-
-
-
-      Learn <span class="text-ayur-gold font-bold">•</span> Unlearn <span class="text-ayur-gold font-bold">•</span> Experience <span class="text-ayur-gold font-bold">•</span> Question <span class="text-ayur-gold font-bold">•</span> Connect
-
-    </p>
-
-
-
-
-Dates
-23–25 October 2026
-
-
-Location
-Igatpuri, Nashik
-
-
-Duration
-3 Days | 2 Nights
-
-
-Cohort
-BAMS, PGs & Vaidyas
-
-
-
-
-
-        Join DECODE
-
-      </button>
-
-
-        Explore The Experience
-
-      </a>
-
-
-
-
-
-
-
-
-
-
-
-The Genesis
-
-      Because Ayurveda was never meant to be <br class="hidden sm:inline"/>
-
-just memorised.
-
-
-
-
-
-
-
-
-
-
-
-        Somewhere between endless lecture halls, thousands of shlokas, hurried dissection practicals, and stressful semester examinations, many students found themselves studying Ayurveda for the <span class="font-semibold text-ayur-dark">next exam</span>—instead of the <span class="font-semibold text-ayur-dark">next patient</span>.
-
-      </p>
-
-
-        The profound healing philosophy that once blossomed under banyan trees and herbal gardens became confined to photocopied notes, clinical vivas, and multiple-choice questions. We memorised the lakshanas, but rarely witnessed them breathe.
-
-      </p>
-
-
-“
-
-          DECODE creates an unhurried, consecrated sanctuary to rediscover and experience Ayurveda deeply—before you step out into the world as Vaidyas.
-
-        </p>
-
-
-
-
-
-
-
-
-
-
-Transforming Perspective
-More Than a Syllabus
-Bridging the vital chasm between academic theory and instinctual clinical wisdom.
-
-
-
-
-
-
-          I
-
-        </div>
-
-From Text to Instinct
-Samhitas → Clinical Thinking
-
-          Moving past rote recitation of verses to understanding the clinical mindset of Charaka and Sushruta in diagnosing real modern disease pathologies.
-
-        </p>
-
-
-
-
-
-          II
-
-        </div>
-
-From Abstract to Tangible
-Concepts → Observation
-
-          Seeing Gunas, Doshas, and Dhatus not as diagrams on a blackboard, but as active biological expressions in the soil, the plants, and human physiology.
-
-        </p>
-
-
-
-
-
-          III
-
-        </div>
-
-From Memorisation to Action
-Theory → Practical Application
-
-          Asking genuine clinical questions, unravelling Chikitsa sutras, and building therapeutic conviction beyond PowerPoint slides and viva answers.
-
-        </p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-The Format
-
-        Knowledge <span class="text-ayur-gold">+</span> Vacation <span class="text-ayur-gold">=</span> Knowcation
-
-      </h2>
-
-
-        Not a sterile hotel seminar. Not an exhaustive cramming camp. An immersive retreat nestled within the misty Western Ghats of Igatpuri.
-
-      </p>
-
-
-
-
-
-
-
-
-Nature & Western Ghats Mist
-
-          Waking up in Igatpuri surrounded by clean mountain air, birdsong, and dew-drenched medicinal flora.
-
-        </p>
-
-
-
-
-
-
-Ayurveda Over Warm Herbal Chai
-
-          Casual yet profound discussions with mentors and peers over seasonal Kwaths and nourishing infusions.
-
-        </p>
-
-
-
-
-
-
-Observing Classical Concepts Live
-
-          Witnessing how Agni shifts with the sun, how Doshas oscillate across diurnal rhythms, and assessing real pulses.
-
-        </p>
-
-
-
-
-
-
-Questioning with Deep Curiosity
-
-          No judgment, no academic hierarchy. Space to ask the foundational 'Whys' that traditional lecture halls often bypass.
-
-        </p>
-
-
-
-
-
-
-Experiences Over Rote Cramming
-
-          Sensory understanding of Rasa, Guna, Virya, and Vipaka through taste, smell, touch, and clinical simulation.
-
-        </p>
-
-
-
-
-
-
-Conversations Past Sunset
-
-          Campfire circles and starlit gatherings where lifelong bonds and clinical collaborative alliances are formed.
-
-        </p>
-
-
-
-
-
-
-
-
-
-
-Curriculum of Depth
-What Will You Decode?
-
-
-        Six foundational learning pillars crafted with gold standard Ayurvedic rigor.
-
-      </p>
-
-
-
-
-
-
-
-
-PILLAR 01
-📜
-
-Beyond the Verses
-
-            Go beyond memorising Samhitas. Understand how classical shlokas actually translate into live clinical diagnostic thinking and patient management today.
-
-          </p>
-
-
-
-          Sutras in action • Not merely for exams
-
-        </div>
-
-
-
-
-
-
-PILLAR 02
-🧠
-
-Think Like a Vaidya
-
-            Learn how to formulate clinical rationale rather than simply matching diseases with pre-fixed proprietary drugs.
-
-          </p>
-
-
-Hetu
-→
-Lakshana
-→
-Samprapti
-→
-Chikitsa
-
-
-
-          Diagnostic chains • Pathological synthesis
-
-        </div>
-
-
-
-
-
-
-PILLAR 03
-🌿
-
-The Root Code
-
-            Decode the eternal core building blocks of classical healing: Agni, Dosha, Dhatu, Mala, Srotas, Prakriti, and Manas as dynamic, interconnected realities.
-
-          </p>
-
-
-
-          Fundamental mechanics of human biology
-
-        </div>
-
-
-
-
-
-
-PILLAR 04
-👁️
-
-The Vaidya's Eye
-
-            Master the art of classical Pariksha:
-
-          </p>
-
-
-Darshana: Visual observation of subtle markers
-Sparshana: Palpation, touch & Naadi examination
-Prashna: Clinical inquiry that uncovers hidden Hetu
-
-
-
-          Trividha Pariksha in live clinical encounters
-
-        </div>
-
-
-
-
-
-
-PILLAR 05
-❓
-
-Why Behind the What
-
-            Shift your mindset from memorising "what medicine to give" to discovering "why the pathology occurred in the first place." Build conviction rooted in logic (Yukti).
-
-          </p>
-
-
-
-          Yukti Pramana &amp; critical reasoning
-
-        </div>
-
-
-
-
-
-
-PILLAR 06
-☀️
-
-Feel It, Live It
-
-            Ayurveda is not merely a medical science; it is lived experiential awareness. Live through Ahara, Vihara, Dinacharya, Manas, Nature immersion, and authentic rituals.
-
-          </p>
-
-
-
-          Transforming self before treating others
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-The DECODE Methodology
-The 6-Step Journey Path
-From discovering classical origins to evolving into an instinctual physician.
-
-
-
-
-
-
-
-
-01
-DISCOVER
-Uncovering original classical intent behind ancient sutras.
-
-
-
-02
-EXPERIENCE
-Sensory engagement with dravyaguna, taste, diet & lifestyle.
-
-
-
-03
-CONNECT
-Bonding with like-minded future Vaidyas and mentors.
-
-
-
-04
-OBSERVE
-Refining clinical Darshana, Sparshana, and Naadi perception.
-
-
-
-05
-DELVE
-Deep diving into Chikitsa, formulation logic, and Mindscaping.
-
-
-
-06
-EVOLVE
-Stepping forward as a grounded, confident, insightful Vaidya.
-
-
-
-
-
-
-
-
-
-
-The Timeline
-A Glimpse of Your 3 Days
-
-
-        A curated rhythm of immersion across three transformative phases in the Western Ghats.
-
-      </p>
-
-
-
-
-
-
-
-          Day 01
-
-        </span>
-
-Phase 1
-Foundation
-
-          Arrival in Igatpuri, grounding rituals, opening the mind, unlearning rote barriers, and reconnecting with original Samhita intent.
-
-        </p>
-
-
-✦ Nature Check-in & Welcome Brew
-✦ Breaking the Textual Mold
-✦ Evening Campfire Circle
-
-
-
-
-
-          Day 02
-
-        </span>
-
-Phase 2
-Building
-
-          Full sensory exploration, pathological tracking from Hetu to Chikitsa, pulse immersion, and active practical workshops.
-
-        </p>
-
-
-✦ Sunrise Dinacharya & Breathwork
-✦ Clinical Reasoning Labs
-✦ Formulation & Mindscaping
-
-
-
-
-
-          Day 03
-
-        </span>
-
-Phase 3
-Implementation
-
-          Integrating modern practicalities—AI, authentic outreach, clinical confidence, and launching your personal Vaidya journey.
-
-        </p>
-
-
-✦ Real-World Practice Blueprints
-✦ Mann Ki Baat Open Forum
-✦ Valedictory Circle & Certification
-
-
-
-
-
-
-        Signature Immersion Sessions You Will Experience
-
-      </h4>
-
-
-
-          🔍 Dosha Detective
-
-        </span>
-
-
-          🎶 Samhita to Swara
-
-        </span>
-
-
-          ⚠️ The Unwanted Guest – Ama
-
-        </span>
-
-
-          🌿 Spot It, Know It, Use It
-
-        </span>
-
-
-          ⚡ The Ayurveda Chain Reaction
-
-        </span>
-
-
-          🔥 The Missing Link – Agni
-
-        </span>
-
-
-          🩺 The Naadi Story
-
-        </span>
-
-
-          🧪 Science Behind Formulations
-
-        </span>
-
-
-          🤖 Use of AI &amp; Marketing in Ayurveda
-
-        </span>
-
-
-          🌌 Mindscaping of Ayurveda
-
-        </span>
-
-
-          💬 Mann Ki Baat
-
-        </span>
-
-
-          🎲 Ayurveda Through Fun Activity
-
-        </span>
-
-
-
-
-
-
-
-
-
-
-Designed For Aspirants
-
-        For BAMS Students, PG Scholars &amp; Budding Vaidyas
-
-      </h2>
-
-
-
-        If you see yourself in this checklist, DECODE is created for you:
-
-      </p>
-
-
-
-
-
-
-✓
-
-            Wants to understand Ayurveda <span class="font-semibold text-ayur-dark">beyond examinations and vivas</span>.
-
-          </p>
-
-
-
-✓
-
-            Feels deep down that there is <span class="font-semibold text-ayur-dark">more to Ayurveda than the college syllabus</span> has shown so far.
-
-          </p>
-
-
-
-✓
-
-            Aspires to become an <span class="font-semibold text-ayur-dark">instinctual, respected, and effective future Vaidya</span>.
-
-          </p>
-
-
-
-✓
-
-            Loves asking <span class="font-semibold text-ayur-dark font-serif italic text-lg">“Why?”</span> and seeks logical clinical clarity rather than blind acceptance.
-
-          </p>
-
-
-
-✓
-
-            Wants practical, tactile understanding of classical concepts like Dosha, Agni, Ama, and Dhatu.
-
-          </p>
-
-
-
-✓
-
-            Longs to meet and collaborate with <span class="font-semibold text-ayur-dark">ambitious, like-minded Ayurveda students</span> from colleges across India.
-
-          </p>
-
-
-
-✓
-
-            Is ready to unlearn passive cramming, question freely, and <span class="font-semibold text-ayur-dark">live the wisdom first-hand</span>.
-
-          </p>
-
-
-
-
-
-          Reserve Your Place In The Cohort
-
-        </button>
-
-
-
-
-
-
-
-
-
-The Shift
-
-      “Come as a Student. <br/>
-
-Leave with a Vaidya’s Perspective.”
-
-
-
-      DECODE isn't about teaching you everything Ayurveda has to offer. <br class="hidden sm:inline"/>
-
-      It's about making you curious enough to keep learning for a lifetime.
-
-    </p>
-
-
-
-
-
-
-
-
-
-
-Lifelong Tribe
-
-          One journey. <br/>
-
-A room full of future Vaidyas.
-
-
-          Medical school can often feel isolating when you desire to practice authentic classical Ayurveda. At DECODE, you join an elite, supportive guild of peers who share your hunger and reverence for the science.
-
-        </p>
-
-
-
-✦
-Meet students and young Vaidyas from top colleges across India.
-
-
-✦
-Share raw clinical struggles, examination doubts, and future aspirations.
-
-
-✦
-Challenge and discuss classical ideas in a safe, constructive environment.
-
-
-✦
-Build lifelong friendships, future co-practice partners, and memories worth cherishing.
-
-
-
-
-            Join the DECODE Circle
-
-          </button>
-
-
-
-
-
-
-
-
-
-The DECODE Cohort 2026
-October 23–25 • Igatpuri Western Ghats
-
-
-
-
-            “When young minds passionate about Ayurveda gather without the pressure of an exam hall, the science comes alive with breathtaking clarity.”
-
-          </blockquote>
-
-
-
-3 Days
-Immersion
-
-
-Limited
-Intimate Seats
-
-
-1 Tribe
-Lifelong Bond
-
-
-
-
-
-
-
-
-
-
-
-
-All-Inclusive Retreat
-What's Included in Your Knowcation
-
-Everything taken care of so you can immerse fully in learning and rejuvenation.
-
-
-
-✓
-
-3 Days / 2 Nights Programme
-Complete experiential curriculum crafted specifically for budding clinicians.
-
-
-
-✓
-
-Curated Learning Sessions
-Direct interaction with experienced practicing Vaidyas and mentors.
-
-
-
-✓
-
-Interactive & Hands-on Labs
-Tactile clinical assessments, Naadi practice, and live formulation discussions.
-
-
-
-✓
-
-Boutique Stay in Nature
-Serene eco-resort accommodation enveloped by misty Western Ghats hills.
-
-
-
-✓
-
-Wholesome Ayurvedic Meals
-Sattvic, delicious, season-aligned cuisine and warm herbal refreshments.
-
-
-
-✓
-
-Community Circles & Campfire
-Evening musical circles, Mann Ki Baat sessions, and starlit discussions.
-
-
-
-✓
-
-Exclusive DECODE Learning Kit
-Specially printed reference journals, Vaidya field guide, and botanical tools.
-
-
-
-✓
-
-Certificate of Participation
-Prestigious credential acknowledging your experiential clinical training.
-
-
-
-✓
-
-Lifelong Memories & Clarity
-A transformed lens on your vocation that endures throughout your career.
-
-
-
-
-
-
-
-
-
-
-
-
-          Exclusive Cohort • Igatpuri, Nashik
-
-        </div>
-
-
-          23–25 October 2026 • 3 Days | 2 Nights
-
-        </h3>
-
-
-          Limited seats to maintain high mentor-student interaction quality and personal clinical attention. Open to BAMS students, interns, and PG scholars.
-
-        </p>
-
-
-
-
-          Join DECODE Now
-
-        </button>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      You have spent years reading about Ayurveda. <br/>
-
-Now… come experience it.
-
-
-      23–25 October 2026 • Igatpuri, Nashik <br/>
-
-      Step out of the lecture halls and into the heart of living Ayurveda.
-
-    </p>
-
-
-      Join DECODE
-
-    </button>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-D.E.C.O.D.E.
-from learning Roots via Routes
-
-
-
-        An experiential Ayurveda learning Knowcation in Igatpuri, Nashik. Bridging ancient Samhita philosophy with tactile modern clinical mastery.
-
-      </p>
-
-
-
-
-Quick Links
-
-Why DECODE?
-The Knowcation
-What You'll Decode
-The 3-Day Journey
-What's Included
-
-
-
-
-Get In Touch
-
-
-
-+91 94051 99797
-
-
-
-decode.ashtang2026@gmail.com
-
-
-
-@d.e.c.o.d.e.2026
-
-
-
-
-
-
-Copyright © 2026 DECODE Ayurveda Knowcation. All rights reserved.
-Discover • Connect • Deepen • Experience • Observe • Evolve
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Join the Cohort
-
-        Join the DECODE Circle
-
-      </h3>
-
-
-        Enter your email to register your interest for the DECODE Ayurveda Knowcation in Igatpuri.
-
-      </p>
-
-
-
-
-Full Name
-
-
-
-Mobile Number
-
-
-
-Gmail Address
-
-
-
-        Join DECODE
-
-      </button>
-
-
-
-      Official inquiries forwarded to <span class="font-medium text-ayur-dark">decode.ashtang2026@gmail.com</span>. We respect your inbox privacy.
-
-    </p>
-
-
-
-
-
-      🌿
-
-    </div>
-
-
-      You're on the DECODE list!
-
-    </h3>
-
-
-      Thank you for taking the step towards living Ayurveda. We will contact you shortly with itinerary details and next steps.
-
-    </p>
-
-
-      Close
-
-    </button>
-
-
-
-
-
-
-
-
-
+</script></body></html>
