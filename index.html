@@ -1057,9 +1057,11 @@
 <script data-purpose="modal-and-submission-handler">
     /**
      * DECODE Modal and Registration Handler
-     * Handles modal opening/closing, accessibility ESC key support, 
-     * localStorage caching, and mock backend webhook forwarding.
+     * Connected to Google Apps Script + Google Sheets
      */
+
+    const DECODE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywopEhwlWg6MaerHIxvVxfJyD_hdSgtaN2XuxhtgfdycKrYMVA8xFZKAq1sdCtZKU4-w/exec";
+
     window.DECODE_MODAL = {
       modal: document.getElementById('signupModal'),
       container: document.getElementById('modalContainer'),
@@ -1075,8 +1077,7 @@
         this.modal.classList.add('opacity-100', 'pointer-events-auto');
         this.container.classList.remove('scale-95');
         this.container.classList.add('scale-100');
-        
-        // Auto-focus email input
+
         setTimeout(function() {
           const emailInput = document.getElementById('subscriberEmail');
           if (emailInput) emailInput.focus();
@@ -1091,55 +1092,81 @@
         this.container.classList.add('scale-95');
       },
 
-      handleSubmit: function(e) {
+      handleSubmit: async function(e) {
         e.preventDefault();
-        const emailInput = document.getElementById('subscriberEmail');
-        if (!emailInput || !emailInput.value) return;
 
-        const email = emailInput.value.trim();
+        const emailInput = document.getElementById('subscriberEmail');
         const submitBtn = document.getElementById('modalSubmitBtn');
 
-        // Provide button feedback
+        if (!emailInput || !emailInput.value.trim()) return;
+
+        const email = emailInput.value.trim();
+
         if (submitBtn) {
           submitBtn.innerText = 'Registering...';
           submitBtn.disabled = true;
         }
 
-        /* 
-         * BACKEND INTEGRATION HOOK:
-         * Replace or forward this payload to your Google Sheets App Script,
-         * Zapier webhook, or email automation engine forwarding to decode.ashtang2026@gmail.com
-         */
-        const leadPayload = {
-          email: email,
-          event: "DECODE Ayurveda Knowcation 2026",
-          location: "Igatpuri, Nashik",
-          timestamp: new Date().toISOString()
-        };
-
-        // Cache lead locally in browser localStorage for offline resilience
         try {
-          const existingLeads = JSON.parse(localStorage.getItem('decode_leads') || '[]');
-          existingLeads.push(leadPayload);
-          localStorage.setItem('decode_leads', JSON.stringify(existingLeads));
-        } catch (err) {
-          console.warn("Storage warning: ", err);
-        }
+          const formData = new FormData();
+          formData.append('email', email);
 
-        // Simulate network turnaround & reveal celebration state
-        setTimeout(() => {
+          const response = await fetch(DECODE_SCRIPT_URL, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+            const successHeading = document.querySelector('#modalSuccessView h3');
+            const successText = document.querySelector('#modalSuccessView p');
+
+            if (successHeading) {
+              successHeading.innerText = "You're on the DECODE list!";
+            }
+
+            if (successText) {
+              successText.innerText = "Thank you for taking the step towards living Ayurveda. We will contact you shortly with itinerary details and next steps.";
+            }
+
+            this.formView.classList.add('hidden');
+            this.successView.classList.remove('hidden');
+            this.form.reset();
+            return;
+          }
+
+          if (result.status === 'duplicate') {
+            const successHeading = document.querySelector('#modalSuccessView h3');
+            const successText = document.querySelector('#modalSuccessView p');
+
+            if (successHeading) {
+              successHeading.innerText = "You're already on the DECODE list!";
+            }
+
+            if (successText) {
+              successText.innerText = "This email address has already been registered for DECODE Ayurveda. We will contact you with the next steps.";
+            }
+
+            this.formView.classList.add('hidden');
+            this.successView.classList.remove('hidden');
+            return;
+          }
+
+          throw new Error(result.message || 'Registration failed.');
+
+        } catch (error) {
+          console.error('DECODE registration error:', error);
+          alert('Something went wrong while registering. Please try again.');
+        } finally {
           if (submitBtn) {
             submitBtn.innerText = 'Join DECODE';
             submitBtn.disabled = false;
           }
-          this.formView.classList.add('hidden');
-          this.successView.classList.remove('hidden');
-          this.form.reset();
-        }, 600);
+        }
       }
     };
 
-    // Close on click outside container
     window.addEventListener('click', function(e) {
       const modal = document.getElementById('signupModal');
       const container = document.getElementById('modalContainer');
@@ -1148,7 +1175,6 @@
       }
     });
 
-    // Close on ESC key press
     window.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         window.DECODE_MODAL.closeModal();
